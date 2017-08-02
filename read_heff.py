@@ -9,12 +9,12 @@ FILENAME = 'heff.H2016'
 
 bformat= "=f"
 
-ns = 360*120*10*6
+ns = 360*120*4
 f = open(FILENAME, 'rb')
 byte_arr=f.read(ns)
 f.close()
-unpacked_bytes = unpack(bformat % (ns/10), byte_arr)
-data=np.array(unpacked_bytes).reshape(360,120*6)
+unpacked_bytes = unpack(bformat % (ns/4), byte_arr)
+data=np.array(unpacked_bytes).reshape(360,120)
 
 
 from scipy.io import FortranFile
@@ -26,4 +26,4 @@ a = ff.read_reals(dtype='f8')
 import numpy as np
 with open(FILENAME,'rb') as nf:
     for k in xrange(120):
-        data = np.fromfile(nf, dtype=np.float32, count = 4)
+        data = np.fromfile(nf, dtype=np.float32, count = 120)
