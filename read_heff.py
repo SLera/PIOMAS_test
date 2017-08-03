@@ -14,16 +14,8 @@ f = open(FILENAME, 'rb')
 byte_arr=f.read(ns)
 f.close()
 unpacked_bytes = unpack(bformat, byte_arr)
-data=np.array(unpacked_bytes).reshape(120,360)
+data=np.array(unpacked_bytes).reshape((360,120), order = 'F')
 
-
-#from scipy.io import FortranFile
-#
-#ff = FortranFile(FILENAME , 'r')
-#a = ff.read_reals(dtype='f8')
-#
-#
-#import numpy as np
-#with open(FILENAME,'rb') as nf:
-#    for k in xrange(120):
-#        data = np.fromfile(nf, dtype=np.float32, count = 120)
+plt.figure()
+plt.imshow(data)
+plt.show()
