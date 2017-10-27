@@ -3,7 +3,7 @@ import numpy as np
 import glob, os
 import matplotlib.pyplot as plt
 
-INDIR = '/home/valeria/NIERSC/Scripts/IceVolume/PIOMAS_test/'
+INDIR = './'
 
 #load lon, lat
 fname_grid = INDIR+'grid.dat'
@@ -29,7 +29,7 @@ f = open(FILENAME, 'rb')
 byte_arr=f.read(ns)
 f.close()
 unpacked_bytes = unpack(bformat, byte_arr)
-data=np.array(unpacked_bytes).reshape((360,120), order = 'F')
+data=np.array(unpacked_bytes).reshape((120,360), order = 'C')
 
 plt.figure()
 plt.imshow(data)
