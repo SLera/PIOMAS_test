@@ -11,9 +11,9 @@ a = np.loadtxt(fname_grid)
 b = a.flatten()
 np.shape(b)
 lon = b[0:43200]
-lons = lon.reshape(360,120)
+lons = lon.reshape(120,360)
 lat = b[43200:]
-lats = lat.reshape(360,120)
+lats = lat.reshape(120,360)
 
 #load grid mask
 kmt = np.loadtxt('kmt_test.txt')
@@ -35,50 +35,18 @@ plt.figure()
 plt.imshow(data)
 plt.show()
 
-#
-#FILENAME = 'iceprod.H2013'
-#
-##bformat= ">%sh"
-#
-#bformat= "=43200f"
-#
-#ns = 360*120*4
-#f = open(FILENAME, 'rb')
-#byte_arr=f.read(ns)
-#f.close()
-#unpacked_bytes = unpack(bformat, byte_arr)
-#data=np.array(unpacked_bytes).reshape((360,120), order = 'F')
-#
-#data_my=data*60*60*24*31
-#ind = np.where(data_my==0)
-#data_my_NaN = data_my
-#data_my_NaN[ind]=np.nan
-#plt.figure()
-#plt.imshow(data_my_NaN, vmin = 2, vmax = 4)
-#plt.colorbar()
-#plt.title('Ice productinon, m, Jan 2013')
-#plt.show()
-#
-#
-#FILENAME = 'area.H2013'
-#
-##bformat= ">%sh"
-#
-#bformat= "=43200f"
-#
-#ns = 360*120*4
-#f = open(FILENAME, 'rb')
-#byte_arr=f.read(ns)
-#f.close()
-#unpacked_bytes = unpack(bformat, byte_arr)
-#area=np.array(unpacked_bytes).reshape((360,120), order = 'F')
-#
-#
-#ind = np.where(area<=0)
-#area_NaN = area
-#area_NaN[ind]=np.nan
-#plt.figure()
-#plt.imshow(area_NaN)
-#plt.colorbar()
-#plt.title('Ice area, Jan 2013')
-#plt.show()
+#Basemap
+from mpl_toolkits.basemap import Basemap
+import matplotlib.pyplot as plt
+
+
+m = Basemap(projection='npstere',boundinglat=48,lon_0=0,resolution='l')
+m.drawcoastlines()
+
+(x, y) = m(lons,lats)
+
+m.pcolormesh(x, y, data)
+plt.colorbar()
+plt.show()
+
+
