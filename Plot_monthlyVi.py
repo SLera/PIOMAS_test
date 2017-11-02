@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """
-Created on Wed Nov  1 13:24:00 2017
+Created on Thu Nov  2 14:21:14 2017
 
 @author: valeria
 """
@@ -10,6 +10,7 @@ from struct import unpack
 import numpy as np
 import glob, os
 import matplotlib.pyplot as plt
+from mpl_toolkits.basemap import Basemap
 
 def read_heff(FILENAME):
     bformat= "=518400f"
@@ -28,18 +29,33 @@ def read_heff(FILENAME):
         heffm.append(data.reshape((120,360), order = 'C'))
     return heffm
 
+def plot_POIMAS_map(PIOMAS_data,title):
+    #load lon, lat
+    fname_grid = './vars/grid.dat'
+    a = np.loadtxt(fname_grid)
+    b = a.flatten()
+    np.shape(b)
+    lon = b[0:43200]
+    lons = lon.reshape(120,360)
+    lat = b[43200:]
+    lats = lat.reshape(120,360)
+    plt.figure()
+    m = Basemap(projection='npstere',boundinglat=48,lon_0=0,resolution='l')
+    m.drawcoastlines()
+    (x, y) = m(lons,lats)
+    m.pcolormesh(x, y, PIOMAS_data)
+    plt.colorbar()
+    plt.title(title)
+    plt.show()
+    return 'plot'
+
 INDIR_vars = './vars/'
 INDIR_data = './'
 
-#load regional mask
-mask = np.load(INDIR_vars+'GreenlandSea_mask')
-ind_mask = np.where(mask==0)
-kmt = np.loadtxt(INDIR_vars+'kmt_test.txt')
-ind_kmt = np.where(kmt<1)
+months = np.array([1,2,3,4,5,6,7,8,9,10,11,12])
 
-fname = INDIR_data+'heff.H2016'
-months = np.array(['Jan', 'Feb','Mar', 'Apr','May','Jun','Jul','Aug', 'Sep', 'Oct', 'Nov','Dec' ])
-months_n = np.arange(1,13)
+#load regional mask
+mask = np.load(INDIR_vars+'Mask_Greenland')
 #load dy and dy for grid cells (in km)
 dxt = np.load(INDIR_vars+'dxt')
 dyt = np.load(INDIR_vars+'dyt')
@@ -48,26 +64,7 @@ fname = INDIR_data+'heff.H2016'
 year =fname[-4:]
 heffm = read_heff(fname)
 
-vi_m = np.zeros(np.shape(months))
 for i in range(len(months)):
     m = months[i]
     vi = heffm[i]*dxt*dyt*1000*1000
-    vi[ind_mask]=0
-    vi[ind_kmt]=0
-    vi=vi/1000/1000/1000 #[km^3]
-    print m, vi.sum()
-    vi_m[i]=vi.sum()
-#    plt.figure()
-#    plt.imshow(vi,vmin=0.1)
-#    plt.colorbar()
-#    plt.title('Vi,km^3'+m+'max = '+str(vi.max()) )
-#    plt.show()
-
-np.savetxt('GreenlandSea'+year+'.txt', vi_m, header = 'Monthly (Jan-Dec) Sea ice volume in km^3',fmt='%1.9f')
-
-plt.figure()
-plt.plot(vi_m)
-plt.xticks(np.arange(len(months)),months)
-plt.ylabel('Ice volume, km^3')
-plt.title(str(year))
-plt.show()
+    plot_POIMAS_map(vi,str(months[i]))
