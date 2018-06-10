@@ -6,7 +6,6 @@ Created on Fri Jun  8 18:04:47 2018
 @author: valeria
 """
 
-import Read_Hi_data
 import numpy as np
 import math
 import os
@@ -16,7 +15,10 @@ from osgeo import osr
 from matplotlib import pyplot as plt
 from mpl_toolkits.basemap import Basemap
 import datetime
+import sys
+sys.path.append('/home/valeria/NIERSC/Scripts/IceVolume/PIOMAS_test/functions/')
 
+import Read_Hi_data
 
 def extract_date_PIOMAS( path ):
     return datetime.datetime.strptime(path[-9:-3], '%Y%m')
@@ -24,21 +26,11 @@ def extract_date_PIOMAS( path ):
 def extract_date_Cr( path ):
     return datetime.datetime.strptime(path[-15:-9], '%Y%m')
 
-def calculate_stat(fname_PIOMAS, fname_Cr):
-    plat,plon,Phi = Read_Hi_data.read_PIOMAS(fname_PIOMAS)
-    clat,clon,Chi, Chi_u = Read_Hi_data.read_Cryosat(fname_Cr)
-    param = find_absdif(Phi,Chi)
-    param_masked = Read_Hi_data.extract_Greenland(param)
-    param_cut_domain = Read_Hi_data(param_masked)
-    clon_cut = Read_Hi_data(clon)
-    clat_cut = Read_Hi_data(clat)
-    return param_cut_domain, clon_cut, clat_cut
-
 def find_absdif(Phi,Chi):
     param = Phi-Chi
     return param
 
-def plot_map_Greenland(param, clon, clat, outfname):
+def plot_map_Greenland(param, clon, clat, outfname, title):
     m = Basemap(resolution="i",
                 projection='laea', lat_ts=90, lat_0=90., lon_0=0.,
                 llcrnrlon= clon[-1,0], llcrnrlat= clat[-1,0] ,
@@ -49,7 +41,7 @@ def plot_map_Greenland(param, clon, clat, outfname):
     plt.colorbar()
     m.drawmeridians(np.arange(-180,180,10))
     m.drawparallels(np.arange(55,80,10))
-    plt.title('PIOMAS-Cryosat_nonan'+outfname[:-4])
+    plt.title('PIOMAS-Cryosat'+title)
     plt.savefig(outfname)
     plt.close()
     return
@@ -60,7 +52,7 @@ flist_Cr =  [os.path.join(INDIR_Cr, f) for f in os.listdir(INDIR_Cr)]
 flist_Cr.sort()
 flist_PIOMAS = [os.path.join(INDIR_PIOMAS, f) for f in os.listdir(INDIR_PIOMAS)]
 flist_PIOMAS.sort()
-
+OUTDIR = '/home/valeria/NIERSC/Scripts/IceVolume/PIOMAS_test_results/Comparison_obs/figs/Greenland/'
 abs_dif = []
 
 
@@ -70,10 +62,17 @@ for i in range(len(flist_PIOMAS)):
     for j in range(len(flist_Cr)):
         date_Cr = extract_date_Cr(flist_Cr[j])
         if date_Cr==date_PIOMAS:
-            param,clon,clat = calculate_stat(flist_PIOMAS[i], flist_Cr[j])
-            abs_dif.append(param)
-            outfname = str(date_PIOMAS.date())+'.png'
-            plot_map_Greenland(param,clon,clat,outfname)
+            clat, clon, chi, chi_u = Read_Hi_data.read_Cryosat(flist_Cr[j])
+            plat, plon, phi = Read_Hi_data.read_PIOMAS(flist_PIOMAS[i])
+            data = phi-chi
+            data = Read_Hi_data.extract_Greenland(data)
+            data = Read_Hi_data.cut_domain(data)
+            clat = Read_Hi_data.cut_domain(clat)
+            clon = Read_Hi_data.cut_domain(clon)
+            abs_dif.append(data)
+            outfname = OUTDIR+str(date_PIOMAS.date())+'_abs_dif.png'
+            title = str(date_PIOMAS.date())+'_abs_dif'
+            plot_map_Greenland(data,clon,clat,outfname,title)
             
 
 v_min = []

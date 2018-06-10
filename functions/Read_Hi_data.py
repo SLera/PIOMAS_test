@@ -14,7 +14,7 @@ def read_Cryosat( fname ):
     lat = data_set.variables['lat'][:]
     lon = data_set.variables['lon'][:]
     Hi = data_set.variables['sea_ice_thickness'][:][0]
-    Hi_unc = data_set.variables['uncertainty'][:][0]
+    Hi_unc = data_set.variables['uncertainty'][:]
     #Hi = np.flipud(Hi)
     data_set.close()
 
@@ -28,7 +28,7 @@ def read_PIOMAS( fname ):
     Hi = data_set.variables['sit'][:]
     #Hi = np.flipud(Hi)
     data_set.close()
-    return  lat[144:576,144:576], lon[144:576,144:576], Hi[144:576,144:576]
+    return lat[144:576,144:576], lon[144:576,144:576], Hi[144:576,144:576]
 
 def extract_Greenland(data):
     GreenlandSea_mask = np.load('/home/valeria/NIERSC/Scripts/IceVolume/PIOMAS_test/POIMASCryosat_Greenland/GreenlandSea_mask_EASE2N.npy')
@@ -37,5 +37,5 @@ def extract_Greenland(data):
     data[ind] = np.nan
     return data
 
-def cut_domaind (data):
+def cut_domain (data):
     return data[242:347,123:260]
