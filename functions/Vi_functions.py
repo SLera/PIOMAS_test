@@ -9,7 +9,19 @@ import numpy as np
 import datetime
 from scipy import stats
 
-def read_PIOMAS_Vi_flux(fname,c):
+def read_PIOMAS_Vi_flux(fname):
+    timestamp, Viflux, Sdrift, Hi, Ci = np.loadtxt(fname,skiprows = 1, unpack=True)
+    days_in_months = [0,31,28,31,30,31,30,31,31,30,31,30,31]
+    dates = []
+    for i in range(len(timestamp)):
+        strng = str(timestamp[i])
+        year = int(strng[0:4])
+        month = int(strng[4:6])
+        Viflux[i]=Viflux[i]*days_in_months[month]
+        dates.append(datetime.datetime(year, month, 1))
+    return Viflux, dates
+
+def read_PIOMAS_Vi_flux_coef(fname,c):
     timestamp, Viflux, Sdrift, Hi, Ci = np.loadtxt(fname,skiprows = 1, unpack=True)
     days_in_months = [0,31,28,31,30,31,30,31,31,30,31,30,31]
     dates = []
@@ -20,7 +32,6 @@ def read_PIOMAS_Vi_flux(fname,c):
         Viflux[i]=Viflux[i]*days_in_months[month]*c
         dates.append(datetime.datetime(year, month, 1))
     return Viflux, dates
-
     
 def read_Cryosat_Vi_flux(fname):
     timestamp_cr, Viflux_cr = np.loadtxt(fname, unpack=True)

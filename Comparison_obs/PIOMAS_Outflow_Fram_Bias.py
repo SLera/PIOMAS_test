@@ -19,7 +19,7 @@ def bias_Vi(model,obs):
     n = len(model)
     b = obs-model
 #    for i in range(len(dataset1)):
-#        b[i]=dataset1[i]-dataset2[i]
+#        b[i]=dataset1[i]-dataset2[i]read_PIOMAS_Vi_flux()
     bias = np.sum(b)/n
     return bias
 

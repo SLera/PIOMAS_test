@@ -31,7 +31,7 @@ def read_heff(FILENAME):
 
 def plot_POIMAS_map(PIOMAS_data,title):
     #load lon, lat
-    fname_grid = './vars/grid.dat'
+    fname_grid = ' /home/valeria/NIERSC/Scripts/IceVolume/PIOMAS_test_results/vars/grid.dat'
     a = np.loadtxt(fname_grid)
     b = a.flatten()
     np.shape(b)
@@ -49,8 +49,8 @@ def plot_POIMAS_map(PIOMAS_data,title):
     plt.show()
     return 'plot'
 
-INDIR_vars = './vars/'
-INDIR_data = './'
+INDIR_vars = '/home/valeria/NIERSC/Scripts/IceVolume/PIOMAS_test_results/vars/'
+INDIR_data = '/home/valeria/NIERSC/Scripts/IceVolume/PIOMAS_test_results/'
 
 months = np.array([1,2,3,4,5,6,7,8,9,10,11,12])
 

@@ -13,6 +13,19 @@ import sys
 sys.path.append('/home/valeria/NIERSC/Scripts/IceVolume/PIOMAS_test/functions/')
 import Vi_functions as V
 
+# These are the "Tableau 20" colors as RGB.
+tableau20 = [(31, 119, 180), (174, 199, 232), (255, 127, 14), (255, 187, 120),
+             (44, 160, 44), (152, 223, 138), (214, 39, 40), (255, 152, 150),
+             (148, 103, 189), (197, 176, 213), (140, 86, 75), (196, 156, 148),
+             (227, 119, 194), (247, 182, 210), (127, 127, 127), (199, 199, 199),
+             (188, 189, 34), (219, 219, 141), (23, 190, 207), (158, 218, 229)]
+
+# Scale the RGB values to the [0, 1] range, which is the format matplotlib accepts.
+for i in range(len(tableau20)):
+    r, g, b = tableau20[i]
+    tableau20[i] = (r / 255., g / 255., b / 255.)
+
+
 INDIR = '/home/valeria/NIERSC/Projects/Bashmachnikov/data/PIOMAS/'
 OUTDIR = '/home/valeria/NIERSC/Scripts/IceVolume/PIOMAS_test/Comparison_obs/'
 #import PIOMAS volume flux
@@ -45,6 +58,12 @@ ind = np.where(np.array(years)==1991)
 i = ind[0][0]
 
 plt.figure(figsize=(15,6))
+
+plt.plot(dates_PIOMAS[i:], Vif_PIOMAS[i:], c = 'royalblue', label = 'PIOMAS')
+plt.plot(dates_PIOMAS[i:], Vif_PIOMAS_c[i:], ls='--', c = 'royalblue', label = 'PIOMAS')
+plt.plot(dates_Cr[:-4], Vif_Cr[:-4],  c = 'darkorange', label = 'Cryosat-2/SMOS')
+plt.plot(dates_k04, Vif_k04, c = 'plum',  label = 'Kwok2004')
+plt.plot(dates_s09, Vif_s09, c = 'mediumspringgreen',  label = 'Spreen2009')
 
 plt.plot(dates_PIOMAS[i:], Vif_PIOMAS[i:], c = 'royalblue', label = 'PIOMAS')
 plt.plot(dates_PIOMAS[i:], Vif_PIOMAS_c[i:], ls='--', c = 'royalblue', label = 'PIOMAS')

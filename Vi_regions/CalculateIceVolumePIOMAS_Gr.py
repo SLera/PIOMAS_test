@@ -28,9 +28,9 @@ def read_heff(FILENAME):
         heffm.append(data.reshape((120,360), order = 'C'))
     return heffm
 
-INDIR_vars = './vars/'
+INDIR_vars = '/home/valeria/NIERSC/Scripts/IceVolume/PIOMAS_test_results/vars/'
 INDIR_data = '/home/valeria/DATA/PIOMAS/v2.1/heff/'
-OUTDIR = './output/Greenland/'
+OUTDIR = '/home/valeria/NIERSC/Scripts/IceVolume/PIOMAS_test_results/output/Greenland/'
 
 #load regional mask
 mask = np.load(INDIR_vars+'GreenlandSea_mask')

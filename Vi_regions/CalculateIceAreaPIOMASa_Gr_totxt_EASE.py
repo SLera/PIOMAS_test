@@ -10,39 +10,40 @@ from struct import unpack
 import numpy as np
 import glob, os
 import matplotlib.pyplot as plt
+import netCDF4
+import calendar
 
-def read_heff(FILENAME):
-    bformat= "=518400f"
-    months = np.arange(1,13)
-    ns = 360*120*4*len(months)
-    f = open(FILENAME, 'rb')
-    byte_arr=f.read(ns)
-    f.close()
-    unpacked_bytes = unpack(bformat, byte_arr)
-    heffm = []
-    for i in range(len(months)):
-        ind1=(120*360)*i
-        ind2=(120*360)*(i+1)
-        #data=np.array(unpacked_bytes[ind1:ind2]).reshape((120,360), order = 'C')
-        data=np.array(unpacked_bytes[ind1:ind2])
-        heffm.append(data.reshape((120,360), order = 'C'))
-    return heffm
+def days_in_month(year,month):
+    dt = calendar.monthrange(year,month)[1]
+    return dt
 
-INDIR_vars = './vars/'
-INDIR_data = '/home/valeria/DATA/PIOMAS/v2.1/area/'
-OUTDIR = './output/Greenland/'
+def calculateVi_PIOMAS(fname):
+    year = int(fname[-9:-5])
+    month = int(fname[-5:-3])
+    data_set = netCDF4.Dataset(fname)
+    # date = datetime.date(2010,1,1)+datetime.timedelta(int(time))
+    lat = data_set.variables['latitude'][:]
+    lon = data_set.variables['longitude'][:]
+    Hi = data_set.variables['sit'][:]
+    dx = data_set.variables['dx_grid'][:]
+    dy = data_set.variables['dy_grid'][:]
+    dt = days_in_month(year,month)
+    Vi = Hi*dt*dx*dy*1000*1000
+    Vi_km = Vi/1000/1000/1000
+    data_set.close()
+    return lat[144:576,144:576], lon[144:576,144:576], Vi_km[144:576,144:576]
 
-#load regional mask
-mask = np.load(INDIR_vars+'GreenlandSea_mask')
-ind_mask = np.where(mask==0)
-kmt = np.loadtxt(INDIR_vars+'kmt_test.txt')
-ind_kmt = np.where(kmt<1)
+def extract_region_PIOMAS(data, mask):
+    ind = np.where(mask == 0)
+    data[ind] = np.nan
+    return data
+
+INDIR_data = '/home/valeria/DATA/PIOMAS/v2.1/EASE_grid/rricker/'
+OUTDIR = '/home/valeria/NIERSC/Scripts/IceVolume/PIOMAS_test_results/output/Greenland/EASE2N_grid/'
+mask = np.load('/home/valeria/NIERSC/Scripts/IceVolume/PIOMAS_test/POIMASCryosat_Greenland/GreenlandSea_mask_Vi_EASE2N.npy')[144:576, 144:576]
 
 months = np.array(['Jan', 'Feb','Mar', 'Apr','May','Jun','Jul','Aug', 'Sep', 'Oct', 'Nov','Dec' ])
 months_n = np.arange(1,13)
-#load dy and dy for grid cells (in km)
-dxt = np.load(INDIR_vars+'dxt')
-dyt = np.load(INDIR_vars+'dyt')
 
 flist=[]
 for root, dirs, ffiles in os.walk(INDIR_data):
@@ -50,80 +51,21 @@ for root, dirs, ffiles in os.walk(INDIR_data):
       flist.append(os.path.join(root, ffile))
 flist.sort()
 
-#a = read_heff(flist[0])plt.figure() 
-
-  
-#for f in range(len(flist)):
-#    fname = flist[f]
-#    year =fname[-4:]
-#    print year
-#    heffm = read_heff(fname)
-#    vi_m = np.zeros(np.shape(months))
-#    for i in range(len(months)):
-#        m = months[i]
-#        vi = heffm[i]*dxt*dyt*1000*1000
-#        vi[ind_mask]=0
-#        vi[ind_kmt]=0
-#        vi=vi/1000/1000/1000 #[km^3]
-#        #print m, vi.sum()
-#        vi_m[i]=vi.sum()
-#    #    plt.figure()
-#    #    plt.imshow(vi,vmin=0.1)
-#    #    plt.colorbar()
-#    #    plt.title('Vi,km^3'+m+'max = '+str(vi.max()) )
-#    #    plt.show()
-#    
-#    np.savetxt(OUTDIR+'GreenlandSea'+year+'.txt', vi_m, header = 'Monthly (Jan-Dec) Sea ice area in km^2',fmt='%1.9f')
-#    
-#    #plt.figure()
-#    plt.plot(vi_m)
-#plt.xticks(np.arange(len(months)),months)
-#plt.ylabel('Sea ice area, km^2')
-#plt.grid()
-#plt.title('1978-2016')
-#plt.show()
-
-plt.figure() 
-
-years_ym =[]
-months_ym=[]
-vi_ym =[]
+datestamp = []
+Vi_list = []
 for f in range(len(flist)):
     fname = flist[f]
-    year =fname[-4:]
-    print year
-    heffm = read_heff(fname)
-    vi_m = np.zeros(np.shape(months))
-    for i in range(len(months)):
-        m = months[i]
-        vi = heffm[i]*dxt*dyt*1000*1000
-        vi[ind_mask]=0
-        vi[ind_kmt]=0
-        vi=vi #[m^3]
-        #print m, vi.sum()
-        vi_m[i]=vi.sum()
-        years_ym.append(int(year))
-        months_ym.append(months_n[i])
-        vi_ym.append(vi.sum())
-    #    plt.figure()
-    #    plt.imshow(vi,vmin=0.1)
-    #    plt.colorbar()
-    #    plt.title('Vi,km^3'+m+'max = '+str(vi.max()) )
-    #    plt.show()
-    
-#    np.savetxt(OUTDIR+'LabIrmingerSea'+year+'.txt', vi_m, header = 'Monthly (Jan-Dec) Sea ice volume in km^3',fmt='%1.9f')
-#    
-#    #plt.figure()
-#    plt.plot(vi_m)
-#plt.xticks(np.arange(len(months)),months)
-#plt.ylabel('Ice volume, km^3')
-#plt.grid()
-#plt.title('1978-2016')
-#plt.show()
+    datestamp.append(int(fname[-9:-5]+fname[-5:-3]))
+    print datestamp[-1]
+    lat, lon, Vip = calculateVi_PIOMAS(fname)
+    Vip_Gr = extract_region_PIOMAS(Vip, mask)
+    Vi_list.append(np.nansum(Vip_Gr))
+table = np.column_stack((np.array(datestamp),np.array(Vi_list)))
+np.savetxt(OUTDIR+'PIOMAS_Vi_Greenland_EASE2N.txt', table,  header = 'timestamp, Sea ice volume in km^3', fmt='%1.2f')
 
-y = np.array(years_ym)
-m = np.array(months_ym)
-vi = np.array(vi_ym)
+plt.figure()
+plt.plot(np.array(Vi_list))
 
-table = np.column_stack((y,m,vi))
-np.savetxt('MonthlyIceArea_PIOMAS_Gr.txt', table, header = 'year, month, Sea ice area in m^2', fmt='%1.2f')
+plt.figure()
+plt.imshow(Vip_Gr)
+plt.colorbar()

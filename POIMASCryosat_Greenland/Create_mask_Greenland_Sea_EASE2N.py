@@ -28,7 +28,11 @@ INDIR = '/home/valeria/DATA/Cryosat2_SMOS/'
 fname = INDIR+'cs2smos_ice_thickness_20101115_20101121_v1.3.nc'
 
 lats, lons, Hi = read_CryosatSMOS(fname)
-REGION = [60, 82,-45, 20]
+# lat0 = 67
+# lat1 = 82
+# lon0 = -30
+# lon1 = 20
+REGION = [67, 82,-30, 20]
 
 GreenlandSea_mask = np.zeros((720,720))
 
@@ -41,7 +45,7 @@ for i in range(720):
                 GreenlandSea_mask[i,j]=1
                 print GreenlandSea_mask[i,j]
                     
-GreenlandSea_mask.dump('GreenlandSea_mask_EASE2N.npy')
+GreenlandSea_mask.dump('GreenlandSea_mask_Vi_EASE2N.npy')
 
 from mpl_toolkits.basemap import Basemap
 

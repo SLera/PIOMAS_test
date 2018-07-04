@@ -41,7 +41,7 @@ def plot_map_Greenland(param, clon, clat, outfname, title):
     plt.colorbar()
     m.drawmeridians(np.arange(-180,180,10))
     m.drawparallels(np.arange(55,80,10))
-    plt.title('PIOMAS-Cryosat'+title)
+    plt.title(title)
     plt.savefig(outfname)
     plt.close()
     return

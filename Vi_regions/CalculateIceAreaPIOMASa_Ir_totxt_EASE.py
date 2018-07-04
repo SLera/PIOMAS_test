@@ -39,8 +39,8 @@ def extract_region_PIOMAS(data, mask):
     return data
 
 INDIR_data = '/home/valeria/DATA/PIOMAS/v2.1/EASE_grid/rricker/'
-OUTDIR = '/home/valeria/NIERSC/Scripts/IceVolume/PIOMAS_test_results/output/Greenland/EASE2N_grid/'
-mask = np.load('/home/valeria/NIERSC/Scripts/IceVolume/PIOMAS_test/POIMASCryosat_Greenland/GreenlandSea_mask_Vi_EASE2N.npy')[144:576, 144:576]
+OUTDIR = '/home/valeria/NIERSC/Scripts/IceVolume/PIOMAS_test_results/output/Irminger/EASE2N_grid/'
+mask = np.load('/home/valeria/NIERSC/Scripts/IceVolume/PIOMAS_test/POIMASCryosat_Greenland/IrmingerLabrador_mask_Vi_EASE2N.npy')[144:576, 144:576]
 
 months = np.array(['Jan', 'Feb','Mar', 'Apr','May','Jun','Jul','Aug', 'Sep', 'Oct', 'Nov','Dec' ])
 months_n = np.arange(1,13)
@@ -61,7 +61,7 @@ for f in range(len(flist)):
     Vip_Gr = extract_region_PIOMAS(Vip, mask)
     Vi_list.append(np.nansum(Vip_Gr))
 table = np.column_stack((np.array(datestamp),np.array(Vi_list)))
-np.savetxt(OUTDIR+'PIOMAS_Vi_Greenland_EASE2N.txt', table,  header = 'timestamp, Sea ice volume in km^3', fmt='%1.2f')
+np.savetxt(OUTDIR+'PIOMAS_Vi_IrmingerLabrador_EASE2N.txt', table,  header = 'timestamp, Sea ice volume in km^3', fmt='%1.2f')
 
 plt.figure()
 plt.plot(np.array(Vi_list))

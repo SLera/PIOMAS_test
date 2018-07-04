@@ -11,7 +11,7 @@ import numpy as np
 import glob, os
 import matplotlib.pyplot as plt
 
-INDIR = './vars/'
+INDIR = '/home/valeria/NIERSC/Scripts/IceVolume/PIOMAS_test_results/vars/'
 
 #load lon, lat
 fname_grid = INDIR+'grid.dat'

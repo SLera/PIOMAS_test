@@ -19,8 +19,8 @@ import datetime
 from scipy import stats
 
 
-fname_Gr ='./MonthlyIceVolume_PIOMAS_Gr.txt'
-fname_Ir = './MonthlyIceVolume_PIOMAS_Ir.txt'
+fname_Gr ='/home/valeria/NIERSC/Scripts/IceVolume/PIOMAS_test_results/MonthlyIceVolume_PIOMAS_Gr.txt'
+fname_Ir = '/home/valeria/NIERSC/Scripts/IceVolume/PIOMAS_test_results/MonthlyIceVolume_PIOMAS_Ir.txt'
 
 y,m,vi = np.loadtxt(fname_Gr, unpack=True)
 vi=vi/1000/1000/1000 #[km^3]
