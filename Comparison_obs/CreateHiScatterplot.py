@@ -69,6 +69,11 @@ clon = np.load('/home/valeria/NIERSC/Scripts/IceVolume/PIOMAS_test_results/Compa
 # PLOT MONTHLY SCATTERPLOTS
 fig, axes = plt.subplots(figsize=(7.38,4), nrows=2, ncols=4, sharex=True, sharey=True)
 fig.subplots_adjust(wspace=0.05, hspace=0.25, top=0.95, bottom=0.05)
+
+p_mean = []
+c_mean = []
+c_u_mean = []
+
 for m in range(len(months)):
     print m
     cr_m = []
@@ -84,6 +89,9 @@ for m in range(len(months)):
         # exclude Cryosat Hi with uncertainties > measurements
         ps = ps[np.where(cr>cr_u)]
         cr = cr[np.where(cr>cr_u)]
+        p_mean.append(ps.mean())
+        c_mean.append(cr.mean())
+        c_u_mean.append(cr_u.mean())
         plt.scatter(cr,ps, s = 5, facecolor='none',alpha = 0.2,edgecolor = tableau20[m],label = str(m))
         # plt.errorbar(cr,p, xerr=cr_u/2, color = tableau20[m], linestyle = 'None')
         cr_m.extend(cr)
@@ -97,46 +105,60 @@ for m in range(len(months)):
     plt.xticks(np.arange(0,9,1))
     plt.yticks(np.arange(0,9,1))
     # plt.axes().set_aspect('equal')
-# plt.show()
+
+plt.subplot(248)
+plt.title('Mean monthly')
+plt.scatter(c_mean,p_mean,s = 5,facecolor='black',edgecolor = 'black')
+# plt.errorbar(cr,p, xerr=cr_u/2, color = tableau20[m], linestyle = 'None')
+slope2, intercept2, r_value2, p_value2, std_er2 = stats.linregress(c_mean,p_mean)
+plt.text(1.2, 2.83, 'slope = ' + str(np.round(slope2, 2)))
+plt.text(1.2, 2.6, 'r = ' + str(np.round(r_value2, 2)))
+plt.xlim((1, 3))
+plt.ylim((1, 3))
+plt.plot([-1, 3], [-1, 3], 'k-', lw=0.5)
+plt.xticks(np.arange(1, 3.1, 0.5))
+plt.yticks(np.arange(1, 3.1, 0.5))
+
+plt.show()
 # plt.tight_layout()
 # plt.savefig(OUTDIR+'Monthly_Hi_scatter_PIOMASvsCryosat.png')
 plt.close()
 
-# PLOT MEAN MONTHLY SCATTER
-plt.figure()
-p_mean = []
-c_mean = []
-c_u_mean = []
-for m in range(len(months)):
-    print m
-    for i in range(len(chi_months[m])):
-        c = chi_months[m][i]
-        c_u = chi_u_months[m][i]
-        p = phi_months[m][i]
-        cr, ps = filter_nan(c, p)
-        cr_u, _ = filter_nan(c_u, p)
-        p_mean.append(ps.mean())
-        c_mean.append(cr.mean())
-        c_u_mean.append(cr_u.mean())
-
-c_mean = np.array(c_mean)
-c_u_mean = np.array(c_u_mean)
-# c_mean = c_mean - c_u_mean
-p_mean = np.array(p_mean)
-c_mean = c_mean[~np.isnan(p_mean)]
-p_mean = p_mean[~np.isnan(p_mean)]
-
-plt.scatter(c_mean,p_mean,facecolor='none',edgecolor = tableau20[m])
-# plt.errorbar(cr,p, xerr=cr_u/2, color = tableau20[m], linestyle = 'None')
-slope2, intercept2, r_value2, p_value2, std_er2 = stats.linregress(c_mean,p_mean)
-line2 = slope2*np.array(c_mean)+intercept2
-
-print 'PIOMASvsCryosat_mean: r, slope, p',  r_value2, slope2, p_value2
-print 'variance PIOMAS_mean:', np.var(p_mean)
-print 'variance Cryosat_mean:', np.var(c_mean)
-# plt.plot(c_mean,line2,ls ='-', c = tableau20[m],lw=0.9)
-plt.plot()
-plt.xlim((0.5,3))
-plt.ylim((0.5,3))
-plt.show()
-
+# # PLOT MEAN MONTHLY SCATTER
+# plt.figure()
+# p_mean = []
+# c_mean = []
+# c_u_mean = []
+# for m in range(len(months)):
+#     print m
+#     for i in range(len(chi_months[m])):
+#         c = chi_months[m][i]
+#         c_u = chi_u_months[m][i]
+#         p = phi_months[m][i]
+#         cr, ps = filter_nan(c, p)
+#         cr_u, _ = filter_nan(c_u, p)
+#         p_mean.append(ps.mean())
+#         c_mean.append(cr.mean())
+#         c_u_mean.append(cr_u.mean())
+#
+# c_mean = np.array(c_mean)
+# c_u_mean = np.array(c_u_mean)
+# # c_mean = c_mean - c_u_mean
+# p_mean = np.array(p_mean)
+# c_mean = c_mean[~np.isnan(p_mean)]
+# p_mean = p_mean[~np.isnan(p_mean)]
+#
+# plt.scatter(c_mean,p_mean,facecolor='none',edgecolor = tableau20[m])
+# # plt.errorbar(cr,p, xerr=cr_u/2, color = tableau20[m], linestyle = 'None')
+# slope2, intercept2, r_value2, p_value2, std_er2 = stats.linregress(c_mean,p_mean)
+# line2 = slope2*np.array(c_mean)+intercept2
+#
+# print 'PIOMASvsCryosat_mean: r, slope, p',  r_value2, slope2, p_value2
+# print 'variance PIOMAS_mean:', np.var(p_mean)
+# print 'variance Cryosat_mean:', np.var(c_mean)
+# # plt.plot(c_mean,line2,ls ='-', c = tableau20[m],lw=0.9)
+# plt.plot()
+# plt.xlim((0.5,3))
+# plt.ylim((0.5,3))
+# plt.show()
+#
