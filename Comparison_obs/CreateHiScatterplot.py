@@ -15,10 +15,9 @@ from osgeo import osr
 from matplotlib import pyplot as plt
 from mpl_toolkits.basemap import Basemap
 import datetime
-import sys
 from scipy import stats
+import sys
 sys.path.append('/home/valeria/NIERSC/Scripts/IceVolume/PIOMAS_test/functions/')
-
 import Read_Hi_data
 
 
@@ -96,6 +95,11 @@ for m in range(len(months)):
         # plt.errorbar(cr,p, xerr=cr_u/2, color = tableau20[m], linestyle = 'None')
         cr_m.extend(cr)
         p_m.extend(ps)
+
+        test = np.where(ps<0)
+        if len(test[0]!=0):
+            print "negative Hi,", m, i
+
     s, i, r, p, std = stats.linregress(np.array(cr_m), np.array(p_m))
     plt.text(0.5,7.3, 'slope = '+ str(np.round(s,2)))
     plt.text(0.5,6.3, 'r = '+ str(np.round(r,2)))

@@ -45,7 +45,7 @@ fsize = cm2inch((20,20))
 plt.figure(figsize=fsize)
 
 title = 'test_map'
-outfname = OUTDIR + 'Regions_Greenland_Irminger.pdf'
+outfname = OUTDIR + 'Regions_Greenland_Irminger.png'
 
 m = Basemap(resolution="i",
             projection='laea', lat_ts=90, lat_0=90., lon_0=0.,

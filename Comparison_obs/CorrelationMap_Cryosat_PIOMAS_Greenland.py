@@ -102,4 +102,4 @@ for i in range(np.shape(cor_array)[0]):
     # monthly_dif[ind]=np.nan
 outfname = OUTDIR+'Correlation_map'+'.pdf'
 title = 'PIOMASvsCryosat,cor_coef'
-Read_Hi_data.plot_map_Greenland(cor_array, (-0.8,0.8), clon, clat, outfname, title)
+Read_Hi_data.plot_map_Greenland(cor_array, (-0.6,0.6), clon, clat, outfname, title)

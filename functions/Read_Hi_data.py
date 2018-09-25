@@ -10,6 +10,14 @@ import numpy as np
 from matplotlib import pyplot as plt
 from mpl_toolkits.basemap import Basemap
 import matplotlib
+import datetime
+
+def extract_date_PIOMAS(path):
+    return datetime.datetime.strptime(path[-9:-3], '%Y%m')
+
+
+def extract_date_Cr(path):
+    return datetime.datetime.strptime(path[-15:-9], '%Y%m')
 
 def read_Cryosat( fname ):
     data_set = netCDF4.Dataset(fname)
