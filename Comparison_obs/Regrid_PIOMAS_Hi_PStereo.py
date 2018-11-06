@@ -12,6 +12,8 @@ import os
 import gdal 
 from gdalconst import * 
 from osgeo import osr
+import matplotlib
+matplotlib.use('qt5agg')
 from matplotlib import pyplot as plt
 
 def tif_to_npy(fname):
@@ -52,11 +54,11 @@ wkt_EASE2N = 'PROJCS["unnamed",GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84
 # # CREATE 25 KM GRID, NSIDC NPStereo
 target_epsg = 'EPSG:3411'
 target_xmin = -3850000
-target_ymin = -5350000
+target_ymin = -58350000
 target_xmax = 3850000
 target_ymax = 5850000
-target_xsize = 12500
-target_ysize = 12500
+target_xsize = 25000
+target_ysize = 25000
 
 def create_tif(nparray, output_tiff):
     driver = gdal.GetDriverByName('GTiff')
@@ -70,9 +72,7 @@ def create_tif(nparray, output_tiff):
     gdalwarp('temp_nsidc.tif', output_tiff, target_epsg, target_xmin, target_xmax, target_ymin, target_ymax, target_xsize, target_ysize)
     
 
-#flist = []
-
-fname = 'piomas_197901.nc'
+fname = '/home/lera/NIERSC/DATA/PIOMAS/EASE_grid/piomas_197901.nc'
 
 lat,lon, Hi = read_CryosatSMOS(fname)
 
@@ -80,5 +80,5 @@ outfname = fname[:-4]+'_nsidc.tif'
     
 create_tif(Hi,outfname)
 
-data = tif_to_npy(outfname)
+# data = tif_to_npy(outfname)
 

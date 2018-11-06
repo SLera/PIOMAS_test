@@ -9,9 +9,12 @@ Created on Thu Nov  2 16:41:38 2017
 from struct import unpack
 import numpy as np
 import glob, os
-import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('qt5agg')
+from matplotlib import pyplot as plt
 
-INDIR = './output/Greenland/'
+
+INDIR = '/home/lera/NIERSC/Scripts/IceVolume/PIOMAS_test_results/output/Greenland/PIOMAS_grid_old_mask/'
 
 flist = os.listdir(INDIR)
 flist.sort()

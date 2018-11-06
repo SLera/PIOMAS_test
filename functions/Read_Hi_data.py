@@ -7,6 +7,8 @@ Created on Fri Jun  8 18:04:47 2018
 """
 import netCDF4
 import numpy as np
+import matplotlib
+matplotlib.use('qt5agg')
 from matplotlib import pyplot as plt
 from mpl_toolkits.basemap import Basemap
 import matplotlib
@@ -36,8 +38,11 @@ def read_PIOMAS( fname ):
     #date = datetime.date(2010,1,1)+datetime.timedelta(int(time))
     lat = data_set.variables['latitude'][:]
     lon = data_set.variables['longitude'][:]
-    Hi = data_set.variables['sit'][:]
+    Hi_eff = data_set.variables['sit'][:]
+    sic = data_set.variables['conc'][:]
+    sic = sic/100 #fraction instead of %
     #Hi = np.flipud(Hi)
+    Hi = Hi_eff/sic
     data_set.close()
     return lat[144:576,144:576], lon[144:576,144:576], Hi[144:576,144:576]
 
@@ -53,9 +58,23 @@ def read_PIOMAS( fname ):
 #     data_set.close()
 
 def extract_Greenland(data):
-    GreenlandSea_mask = np.load('/home/valeria/NIERSC/Scripts/IceVolume/PIOMAS_test/POIMASCryosat_Greenland/GreenlandSea_mask_EASE2N.npy')
+    GreenlandSea_mask = np.load('/home/lera/NIERSC/Scripts/IceVolume/PIOMAS_test/POIMASCryosat_Greenland/GreenlandSea_mask_EASE2N.npy')
     GreenlandSea_mask = GreenlandSea_mask[144:576, 144:576]
     ind = np.where(GreenlandSea_mask == 0)
+    data[ind] = np.nan
+    return data
+
+def extract_Greenland_Vi(data):
+    GreenlandSea_mask = np.load('/home/lera/NIERSC/Scripts/IceVolume/PIOMAS_test/POIMASCryosat_Greenland/GreenlandSea_mask_Vi_EASE2N.npy')
+    GreenlandSea_mask = GreenlandSea_mask[144:576, 144:576]
+    ind = np.where(GreenlandSea_mask == 0)
+    data[ind] = np.nan
+    return data
+
+def extract_Irminger_Vi(data):
+    IrmingerSea_mask = np.load('/home/lera/NIERSC/Scripts/IceVolume/PIOMAS_test/POIMASCryosat_Greenland/IrmingerLabrador_mask_Vi_EASE2N.npy')
+    IrmingerSea_mask = IrmingerSea_mask[144:576, 144:576]
+    ind = np.where(IrmingerSea_mask == 0)
     data[ind] = np.nan
     return data
 

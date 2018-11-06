@@ -8,9 +8,9 @@ Created on Thu Nov 23 16:14:12 2017
 
 from struct import unpack
 import numpy as np
+import matplotlib
+matplotlib.use('qt5agg')
 import matplotlib.pyplot as plt
-
-
 from struct import unpack
 import numpy as np
 import glob, os
@@ -19,13 +19,16 @@ import datetime
 from scipy import stats
 
 
-fname_Gr ='/home/valeria/NIERSC/Scripts/IceVolume/PIOMAS_test_results/MonthlyIceVolume_PIOMAS_Gr.txt'
-fname_Ir = '/home/valeria/NIERSC/Scripts/IceVolume/PIOMAS_test_results/MonthlyIceVolume_PIOMAS_Ir.txt'
+fname_Gr ='/home/lera/NIERSC/Scripts/IceVolume/PIOMAS_test_results/MonthlyIceVolume_PIOMAS_Gr.txt'
+fname_Ir = '/home/lera/NIERSC/Scripts/IceVolume/PIOMAS_test_results/MonthlyIceVolume_PIOMAS_Ir.txt'
+
+fname_Gr = '/home/lera/NIERSC/Scripts/IceVolume/PIOMAS_test_results/output/Greenland/EASE2N_grid_v2/PIOMAS_Vi_Greenland_EASE2N.txt'
+fname_Ir = '/home/lera/NIERSC/Scripts/IceVolume/PIOMAS_test_results/output/Greenland/EASE2N_grid_v2/PIOMAS_Vi_IrmingerLabrador_EASE2N.txt'
+
 
 y,m,vi = np.loadtxt(fname_Gr, unpack=True)
-vi=vi/1000/1000/1000 #[km^3]
 months = range(12)
-years = np.arange(1978,2017)
+years = np.arange(1979,2017)
 
 #mean winter (December-April) Volume
 months_winter = np.array([12,1,2,3,4])
@@ -34,10 +37,15 @@ for i in range(len(years)):
     #print years[i]
     winter_year = 0
     for j in range(len(m)):
-        if (y[j]==years[i]) and (m[j] in months_winter):
+        if (y[j] == years[i]) and (m[j] in months_winter[1:]):
             winter_year += vi[j]
-            #print winter_year
-    v_winter[i] = winter_year/5
+        if (y[j] == years[i] - 1) and (m[j] == 12):
+            winter_year += vi[j]
+
+    if i == 0:
+        v_winter[i] = winter_year / 4
+    else:
+        v_winter[i] = winter_year / 5
 
 slope1, intercept1, r_value1, p_value1, std_err1 = stats.linregress(years, v_winter) 
 print slope1, r_value1, p_value1, std_err1   
@@ -56,9 +64,8 @@ plt.title('Trends in winter (Dec-Apr) sea ice volume')
 
 #Irminger Sea
 y,m,vi = np.loadtxt(fname_Ir, unpack=True)
-vi=vi/1000/1000/1000 #[km^3]
 months = range(12)
-years = np.arange(1978,2017)
+years = np.arange(1979,2017)
 
 #mean winter (December-April) Volume
 months_winter = np.array([12,1,2,3,4])
@@ -67,10 +74,15 @@ for i in range(len(years)):
     #print years[i]
     winter_year = 0
     for j in range(len(m)):
-        if (y[j]==years[i]) and (m[j] in months_winter):
+        if (y[j]==years[i]) and (m[j] in months_winter[1:]):
             winter_year += vi[j]
-            #print winter_year
-    v_winter[i] = winter_year/5
+        if (y[j]==years[i]-1) and (m[j] == 12):
+            winter_year += vi[j]
+
+    if i == 0:
+        v_winter[i] = winter_year/4
+    else:
+        v_winter[i] = winter_year / 5
 
 slope1, intercept1, r_value1, p_value1, std_err1 = stats.linregress(years, v_winter) 
 print slope1, r_value1, p_value1, std_err1   
@@ -83,8 +95,5 @@ ax2.plot(years, line1, 'b--', lw = 1)
 ax2.set_ylabel('Irminger/Labrador Seas winter sea ice volume, km^3', color='b')
 ax2.tick_params('y', colors='b')
 #ax2.yaxis.set_ticks(np.arange(0, 101, 25))
-plt.xticks(np.arange(1978,2018,3))
-plt.legend(loc=1)
-plt.tight_layout()
-plt.show()
-plt.savefig('ViWinterTrends.pdf', dpi=400)
+#plt.show()
+plt.savefig('ViWinterTrends_EASE.pdf', dpi=400)

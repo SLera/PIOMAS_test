@@ -67,20 +67,16 @@ chi_u_months = np.load('/home/lera/NIERSC/Scripts/IceVolume/PIOMAS_test_results/
 clat = np.load('/home/lera/NIERSC/Scripts/IceVolume/PIOMAS_test_results/Comparison_obs/clat_full')
 clon = np.load('/home/lera/NIERSC/Scripts/IceVolume/PIOMAS_test_results/Comparison_obs/clon_full')
 
-# PLOT MONTHLY SCATTERPLOTS
-fig, axes = plt.subplots(figsize=(7.38,4), nrows=2, ncols=4, sharex=True, sharey=True)
-fig.subplots_adjust(wspace=0.05, hspace=0.20, top=0.95, bottom=0.05)
-
+# PLOT MEAN MONTHLY SCATTER
+plt.figure()
 p_mean = []
 c_mean = []
 c_u_mean = []
+p_mean_filt = []
+c_mean_filt = []
 
 for m in range(len(months)):
     print m
-    cr_m = []
-    p_m = []
-    plt.subplot('24' + str(m + 1))
-    plt.title(str(months[m]))
     for i in range(len(chi_months[m])):
         c = chi_months[m][i]
         c_u = chi_u_months[m][i]
@@ -88,44 +84,45 @@ for m in range(len(months)):
         cr, ps = filter_nan(c, p)
         cr_u, _ = filter_nan(c_u, p)
         # exclude Cryosat Hi with uncertainties > measurements
-        ps = ps[np.where(cr>cr_u)]
-        cr = cr[np.where(cr>cr_u)]
+        ps_filt = ps[np.where(cr > cr_u)]
+        cr_filt = cr[np.where(cr > cr_u)]
         p_mean.append(ps.mean())
         c_mean.append(cr.mean())
         c_u_mean.append(cr_u.mean())
-        plt.scatter(cr,ps, s = 5, facecolor='none',alpha = 0.2,edgecolor = tableau20[m],label = str(m))
-        # plt.errorbar(cr,p, xerr=cr_u/2, color = tableau20[m], linestyle = 'None')
-        cr_m.extend(cr)
-        p_m.extend(ps)
+        p_mean_filt.append(ps_filt.mean())
+        c_mean_filt.append(cr_filt.mean())
 
-        test = np.where(ps<0)
-        if len(test[0]!=0):
-            print "negative Hi,", m, i
+c_mean = np.array(c_mean)
+p_mean = np.array(p_mean)
+# c_mean = c_mean[~np.isnan(p_mean)]
+# p_mean = p_mean[~np.isnan(p_mean)]
 
-    s, i, r, p, std = stats.linregress(np.array(cr_m), np.array(p_m))
-    plt.text(0.5,7.1, 'slope = '+ str(np.round(s,2)))
-    plt.text(0.5,6.3, 'r = '+ str(np.round(r,2)))
-    plt.xlim((0,8))
-    plt.ylim((0,8))
-    plt.plot([-1,9],[-1,9],'k-', lw = 0.5)
-    plt.xticks(np.arange(0,9,1))
-    plt.yticks(np.arange(0,9,1))
-    # plt.axes().set_aspect('equal')
+c_mean_filt = np.array(c_mean_filt)
+p_mean_filt = np.array(p_mean_filt)
+# c_mean_filt = c_mean_filt[~np.isnan(p_mean_filt)]
+# p_mean_filt = p_mean_filt[~np.isnan(p_mean_filt)]
 
-plt.subplot(248)
-plt.title('Mean monthly')
-plt.scatter(c_mean,p_mean,s = 5,facecolor='black',edgecolor = 'black')
+
+plt.scatter(c_mean,p_mean,facecolor='none',edgecolor = 'b', label = 'all Hi_CS')
+plt.scatter(c_mean_filt, p_mean_filt, facecolor='none', edgecolor='r', label='Hi_CS>Hi_CS_uncertainty')
 # plt.errorbar(cr,p, xerr=cr_u/2, color = tableau20[m], linestyle = 'None')
 slope2, intercept2, r_value2, p_value2, std_er2 = stats.linregress(c_mean,p_mean)
-plt.text(1.2, 2.83, 'slope = ' + str(np.round(slope2, 2)))
-plt.text(1.2, 2.6, 'r = ' + str(np.round(r_value2, 2)))
-plt.xlim((1, 3))
-plt.ylim((1, 3))
-plt.plot([-1, 3], [-1, 3], 'k-', lw=0.5)
-plt.xticks(np.arange(1, 3.1, 0.5))
-plt.yticks(np.arange(1, 3.1, 0.5))
+line2 = slope2*np.array(c_mean)+intercept2
 
-plt.tight_layout()
+slope3, intercept3, r_value3, p_value3, std_er3 = stats.linregress(c_mean_filt, p_mean_filt)
+line2 = slope2 * np.array(c_mean) + intercept2
+print 'PIOMASvsCryosat_mean: r, slope, p',  r_value2, slope2, p_value2
+print 'variance PIOMAS_mean:', np.var(p_mean)
+print 'variance Cryosat_mean:', np.var(c_mean)
+
+print 'PIOMASvsCryosat_mean -UN: r, slope, p', r_value3, slope3, p_value3
+print 'variance PIOMAS_mean -UN:', np.var(p_mean_filt)
+print 'variance Cryosat_mean -UN:', np.var(c_mean_filt)
+# plt.plot(c_mean,line2,ls ='-', c = tableau20[m],lw=0.9)
+plt.plot()
+plt.xlabel('CS, m')
+plt.ylabel('PIOMAS, m')
+plt.xlim((0.5,3))
+plt.ylim((0.5,3))
 plt.show()
-plt.savefig(OUTDIR+'Monthly_Hi_scatter_PIOMASvsCryosat2.png')
-plt.close()
+
